@@ -1,3 +1,0 @@
-mkdir templates 
-inventories/production/group_vars/proxy.yml
-ansible-playbook -i inventories/production/hosts playbook1_keepalived.yml
