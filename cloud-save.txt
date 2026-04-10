@@ -1,0 +1,33 @@
+srv-br
+apt-get update && apt-get install -y apache2 apache2-mod_ssl apache2-mod_php8.4 php8.4 php8.4-{pgsql,pdo_pgsql,curl,dom,exif,fileinfo,gd2,gmp,imagick,intl,libs,mbstring,memcached,opcache,openssl,pcntl,pdo,xmlreader,zip,ldap}
+
+for i in dir env headers mime rewrite;do a2enmod $i;done
+systemctl enable --now httpd2
+wget https://download.nextcloud.com/server/releases/nextcloud-33.0.0.zip
+unzip nextcloud-33.0.0.zip && rm -f nextcloud-33.0.0.zip
+cp -r nextcloud /var/www/html/ && rm -rf nextcloud
+
+chown -R root /var/www/html/nextcloud
+mkdir /var/www/html/nextcloud/data
+chown -R apache2 /var/www/html/nextcloud/{apps,config,data}/
+/etc/httpd2/conf/sites-available/nextclod.conf
+ln -s /etc/httpd2/conf/sites-available/nextcloud.conf /etc/httpd2/conf/sites-enabled/
+systemctl restart httpd2
+
+apt-get install -y postgresql17-server
+/etc/init.d/postgresql initdb
+systemctl enable --now postgresql
+
+su - postgres -s /bin/bash -c 'createuser --no-superuser --no-createdb --no-createrole --encrypted --pwprompt nextclouduser'
+su - postgres -s /bin/bash -c 'createdb -O nextclouduser nextclouddb'
+
+nano /var/www/html/nextcloud/config/config.php 1 => 'ncloud.au.team'
+adm-hq
+admin - apps - otkl apps - LDAP vkl
+admin - parameter server - users - persons - group - cod hq br 
+admin - ychet zapis - 
+
+fq-hq 
+service - obrat proxy - ncloud.au.team http srb-br.au.team perenaprav https
+
+dns FreeIPA - add zapis resyrs DNS - ncloud CNAME fw-hq.au.team

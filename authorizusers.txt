@@ -1,0 +1,13 @@
+tex.poderz - otkl inet vsem
+users-authoriz-add (Ip and MAC)-hq.user5 10.1.1.10 post author-prover it 
+users-authoriz-add (Ip and MAC)-hq.user4 10.1.1.46 post author poluch MAC-proverit 
+
+cli-hq
+sertificat download 
+ideco client download lin 
+mv /home/user/download/root_ca.crt /etc/pki/ca-trust/source/anchors/ && update-ca-trust
+cd /home/user/download
+chmod +x IdecoAgent.sh
+./IdecoAgent.sh
+kinit hq.user3
+IdecoClient-hq.user3 hq.user3@au.team P@ssw0rd 10.1.1.1

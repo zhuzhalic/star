@@ -1,0 +1,53 @@
+fq-hq
+service-network interface-add GRE- tunnel.1 role-WAN inter-ISP local ip-63.27.18.18 ipconfig 10.0.1.1/30
+
+service-network interface-add GRE- tunnel.2 role-WAN inter-ISP local ip-63.27.18.18 ipconfig 10.0.2.1/30
+
+marhrutizac - static - add BR add object - type Podset BR vlan 10 10.2.1.0/28 -type Podset BR vlan 20 10.2.2.0/25 - type Podset RTR-BR <-> FW-BR 10.2.0.0/30 - interface tunnel.1 gateway add object - type IP-add RTR-BR tunnel.1 10.0.1.2 - priority 10 
+analog COD
+
+
+rtr-br
+
+interface tunnel.1
+description "GRE-to-FW-HQ"
+ip address 10.0.1.2/30
+ip tunnel 84.212.78.78 63.27.18.18 mode gre
+interface tunnel.3
+description "GRE-to-RTR-COD"
+ip address 10.0.3.2/30
+ip tunnel 84.212.78.78 34.95.33.33 mode gre
+
+ip route 10.1.1.0/27 10.0.1.1
+ip route 10.1.1.32/28 10.0.1.1
+ip route 10.1.2.0/24 10.0.1.1
+
+router ospf 2
+passive-interface default
+no passive-interface tunnel.3 
+network 10.0.3.0/30 area 0
+
+rtr-cod
+
+interface tunnel.2
+description "GRE-to-FW-HQ"
+ip address 10.0.2.2/30
+ip tunnel 34.95.33.33 63.27.18.18 mode gre
+interface tunnel.3
+description "GRE-to-RTR-BR"
+ip address 10.0.3.1/30
+ip tunnel 34.95.33.33 84.212.78.78 mode gre
+
+ip route 10.1.1.0/27 10.0.2.1
+ip route 10.1.1.32/28 10.0.2.1
+ip route 10.1.2.0/24 10.0.2.1
+
+router ospf 1
+passive-interface default
+no passive-interface tunnel.3 
+network 10.0.3.0/30 area 0
+network 172.16.0.0/23 area 0
+
+ip route 10.2.0.0/30 10.0.3.2
+ip route 10.2.1.0/28 10.0.3.2
+ip route 10.2.2.0/25 10.0.3.2

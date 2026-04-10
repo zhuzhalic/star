@@ -1,0 +1,44 @@
+- name: Install and settings keepalived for HA1-COD and HA2-COD
+  hosts: proxy
+  become: true
+
+  tasks:
+    - name: Install package 'keepalived'
+      community.general.apt_rpm:
+        name: "keepalived"
+        state: present
+        update_cache: true
+
+- hosts: ha1-cod
+  become: true
+
+  tasks:
+    - name: Copy the 'keepalived.conf' file for MASTER
+      ansible.builtin.template:
+        src: templates/keepalived-master.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+- hosts: ha2-cod
+  become: true
+
+  tasks:
+    - name: Copy the 'keepalived.conf' file for BACKUP
+      ansible.builtin.template:
+        src: templates/keepalived-backup.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+- hosts: proxy
+  become: true
+
+  tasks:
+    - name: Started and enabled keepalived
+      ansible.builtin.systemd:
+        name: keepalived
+        state: started
+        enabled: true

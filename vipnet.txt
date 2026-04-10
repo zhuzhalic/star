@@ -1,0 +1,51 @@
+inet show interface
+eth0 -  RTR-BR
+eth1 - vSW-BR
+machine set hostname fw-br.au.team
+iplir stop
+inet ifconfig eth1 class trunk
+yes
+inet ifconfig eth1 vlan add 10
+inet ifconfig eth1 vlan add 20
+inet ifconfig eth1.10 address 10.2.1.14 netmask 255.255.255.240
+inet ifconfig eth1.20 address 10.2.2.1 netmask 255.255.255.128
+iplir config
+[adapter]
+name= eth1
+allowtraffic= off
+type= internal
+[adapter]
+name= eth1.10
+allowtraffic= on
+type= internal
+
+[adapter]
+name= eth1.20
+allowtraffic= on
+type= internal
+
+inet ifconfig eth1 up
+iplir start
+inet show vlan
+inet ifconfig eth0 address 10.2.0.2 netmask 255.255.255.252
+inet show interface eth0
+
+inet ospf mode on
+inet ospf network add 10.2.0.0 netmask 255.255.255.252 area 1
+inet ospf network add 10.2.1.0 netmask 255.255.255.240 area 1
+inet ospf network add 10.2.2.0 netmask 255.255.255.128 area 1
+firewall forward add 1 src @any dst @any pass
+firewall local add 1 src @any dst @any pass
+inet show ospf neighbor
+
+inet dhcp server add interface eth1.20
+inet dhcp server add range 10.2.2.2 10.2.2.126 interface eth1.20
+inet dhcp server add router 10.2.2.1 interface eth1.20
+inet dhcp server add dns 10.1.1.10 interface eth1.20
+inet dhcp server add domain au.team interface eth1.20
+inet dhcp server start
+
+inet dhcp server start
+inet dhcp server mode on
+
+inet show dhcp server 

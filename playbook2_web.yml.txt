@@ -1,0 +1,25 @@
+---
+- name: Install Installing the Angie Web Server
+  hosts: server
+  become: true
+  
+  tasks:
+    - name: Install package 'angie'
+      community.general.apt_rpm:
+        name: "angie"
+        state: present
+        update_cache: true
+        
+    - name: Copy the 'index.html' file
+      ansible.builtin.template:
+        src: templates/index.html.j2
+        dest: /usr/share/angie/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+        
+    - name: Started and enabled angie
+      ansible.builtin.systemd:
+        name: angie
+        state: started
+        enabled: true

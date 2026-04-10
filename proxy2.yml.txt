@@ -1,0 +1,9 @@
+haproxy_frontend_bind_address: "0.0.0.0"
+haproxy_frontend_bind_port: "80"
+haproxy_backend_add_hosts:
+  - name: "srv1-cod"
+    address: "172.16.1.1"
+  - name: "srv2-cod"
+    address: "172.16.1.2"
+  - name: "srv3-cod"
+    address: "172.16.1.3"

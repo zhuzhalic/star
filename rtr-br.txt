@@ -1,0 +1,60 @@
+enable
+configure terminal
+hostname rtr-br
+ip domain-name au.team
+username net_admin
+password P@ssw0rd
+role admin
+
+interface ge0
+description "Connect-to-ISP"
+ip address 84.212.78.78/27
+
+port ge0
+service-instance ge0/ge0
+encapsulation untagged 
+connect ip interface ge0 
+
+interface ge1
+description "Connect-to-FW-BR"
+ip address 10.2.0.1/30
+
+port ge1
+service-instance ge1/ge1
+encapsulation untagged 
+connect ip interface ge1
+
+interface loopback.0
+ip address 192.168.255.2/32
+no shutdown 
+
+router isis
+net 49.0001.1921.6825.5002.00
+is-type level-2-only
+metric-style wide
+passive-interface loopback.0 
+
+interface ge0 
+ip router isis
+isis circuit-type level-2-only
+isis network point-to-point
+
+interface loopback.0
+ip router isis
+
+router bgp 64499
+bgp router-id 192.168.255.2
+bgp log-neighbor-changes
+neighbor 192.168.255.1 remote-as 64499
+neighbor 192.168.255.1 update-source loopback.0
+neighbor 192.168.255.1 description iBGP-to-ISP
+address-family ipv4 unicast
+neighbor 192.168.255.1 activate
+neighbor 192.168.255.1 next-hop-self
+exit-address-family
+
+router ospf 1
+passive-interface default
+no passive-interface int1 
+network 10.2.0.0/30 area 1
+default-information originate

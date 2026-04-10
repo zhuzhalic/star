@@ -1,0 +1,8 @@
+<html>
+   <head>
+      <title>AU_Team</title>
+   </head>
+   <body>
+      <h1>{{ ansible_facts['hostname'] }} by Angie!</h1>
+   </body>
+</html>

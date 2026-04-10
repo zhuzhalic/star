@@ -1,0 +1,35 @@
+global
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    daemon
+
+defaults
+    log     global
+    mode    http
+    retries 2
+    timeout client 30m
+    timeout connect 4s
+    timeout server 30m
+    timeout check 5s
+
+frontend main
+    bind {{ haproxy_frontend_bind_address }}:{{ haproxy_frontend_bind_port }}
+    default_backend             app
+
+backend app
+    balance     roundrobin
+    option httpchk GET /
+    http-request set-header X-Forwarded-For %[src]
+    http-request set-header X-Forwarded-Proto http
+{% for record in haproxy_backend_add_hosts %}
+    server {{ record.name }} {{ record.address }}:80 check
+{% endfor %}
+
+listen stats
+    bind *:9000
+    mode http
+    stats enable
+    stats hide-version
+    stats realm Haproxy\ Statistics
+    stats uri /haproxy_stats

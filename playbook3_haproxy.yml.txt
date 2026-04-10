@@ -1,0 +1,25 @@
+---
+- name: Install and settings haproxy for HA1-COD and HA2-COD
+  hosts: proxy
+  become: true
+
+  tasks:
+    - name: Install package 'haproxy'
+      community.general.apt_rpm:
+        name: "haproxy"
+        state: present
+        update_cache: true
+
+    - name: Copy the 'haproxy.cfg' file
+      ansible.builtin.template:
+        src: templates/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Started and enabled haproxy
+      ansible.builtin.systemd:
+        name: haproxy
+        state: started
+        enabled: true

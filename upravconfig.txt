@@ -1,0 +1,40 @@
+HA1-COD, HA2-COD, SRV1-COD, SRV2-COD, SRV3-COD:
+sed -i "s/#PermitRootLogin without-password/PermitRootLogin yes/g" /etc/openssh/sshd_config
+systemctl restart sshd
+
+ADM-HQ:
+apt-get update && apt-get install -y python3-module-pip
+ssh-keygen -t rsa
+for i in ha1 ha2 srv1 srv2 srv3;
+do
+ssh-copy-id root@$i-cod
+done
+mkdir /home/user/ansible
+cd /home/user/ansible
+python3 -m venv venv/ansible
+source venv/ansible/bin/activate
+pip install --upgrade pip && pip install ansible
+mkdir -p inventories/production
+
+cat <<EOF > inventories/production/hosts
+all:
+  children:
+    proxy:
+      hosts:
+        ha1-cod:
+        ha2-cod:
+    server:
+      hosts:
+        srv1-cod:
+        srv2-cod:
+        srv3-cod:
+EOF
+
+mkdir inventories/production/group_vars
+
+cat <<EOF > inventories/production/group_vars/all.yml
+---
+ansible_python_interpreter: /usr/bin/python3
+ansible_ssh_user: root
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
+EOF
